@@ -7,9 +7,28 @@ namespace TestProject
       Console.WriteLine("Please enter transaction details in <Date> <Account> <Type> <Amount> format");
       Console.WriteLine("(or enter blank to go back to main menu):");
       string input = Console.ReadLine() ?? "";
-      if (Transaction.VerifyInput(input))
+      if (input == "") {
+        MainMenu();
+      } else if (Transaction.VerifyInput(input))
       {
         Transaction.CreateTransaction(input);
+      } else {
+        TransactionMenu();
+      }
+    }
+
+    static void InterestMenu()
+    {
+      Console.WriteLine("Please enter interest rules details in <Date> <RuleId> <Rate in %> format");
+      Console.WriteLine("(or enter blank to go back to main menu):");
+      string input = Console.ReadLine() ?? "";
+      if (input == "") {
+        MainMenu();
+      } else if (Interest.VerifyInput(input))
+      {
+        Interest.CreateInterest(input);
+      } else {
+        InterestMenu();
       }
     }
 

@@ -29,8 +29,19 @@ namespace TestProject
 
     static public bool VerifyInput(string input)
     {
-      // TODO implement verify
+      string[] inputSplitted = input.Split(' ');
       // sample input: "20230626 AC001 W 100.00"
+
+      if (inputSplitted.Length != 4) return false;
+
+      if (inputSplitted[0].Length != 7) return false;
+      
+      string transactionType = inputSplitted[2];
+      if (transactionType != "D" && transactionType != "W") return false;
+      
+      double amount = double.Parse(inputSplitted[3]);
+      if (amount <= 0) return false;
+
       return true;
     }
 
