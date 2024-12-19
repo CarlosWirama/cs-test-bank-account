@@ -12,6 +12,7 @@ namespace TestProject
       } else if (Transaction.VerifyInput(input))
       {
         Transaction.CreateTransaction(input);
+        MainMenu();
       } else {
         TransactionMenu();
       }
@@ -27,6 +28,7 @@ namespace TestProject
       } else if (Interest.VerifyInput(input))
       {
         Interest.CreateInterest(input);
+        MainMenu();
       } else {
         InterestMenu();
       }
@@ -41,15 +43,21 @@ namespace TestProject
         MainMenu();
       } else if (Print.VerifyInput(input))
       {
-        Print.Print(input);
+        Print.PrintStatement(input);
       } else {
         PrintMenu();
+        MainMenu();
       }
     }
 
 
-    static public void MainMenu()
+    static public void MainMenu(bool isFirstTime = false)
     {
+      if (isFirstTime) {
+        Console.WriteLine("Welcome to AwesomeGIC Bank! What would you like to do?");
+      } else {
+        Console.WriteLine("Is there anything else you'd like to do?");
+      }
       Console.WriteLine("[T] Input transactions");
       Console.WriteLine("[I] Define interest rules");
       Console.WriteLine("[P] Print statement");
@@ -64,7 +72,7 @@ namespace TestProject
         case "p": PrintMenu(); break;
         // quit
         case "q": break;
-        default MainMenu(); break;
+        default: MainMenu(); break;
       }
     }
   }

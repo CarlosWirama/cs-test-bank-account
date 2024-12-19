@@ -15,7 +15,7 @@ namespace TestProject
       
       if (inputSplitted.Length != 3) return false;
       
-      if (inputSplitted[0].Length != 7) return false;
+      if (inputSplitted[0].Length != 8) return false;
       
       double rate = double.Parse(inputSplitted[2]);
       if (rate <= 0 || rate >= 100) return false;
@@ -37,9 +37,6 @@ namespace TestProject
       {
         Console.WriteLine($" | {Interest.dateString,7} | {Interest.id,10} | {Interest.rate, 10:C} |");
       });
-
-      Console.WriteLine("Is there anything else you'd like to do?");
-      Menu.MainMenu();
     }
   }
 }

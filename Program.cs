@@ -9,7 +9,6 @@
  */
 
 
-Console.WriteLine(@"Welcome to AwesomeGIC Bank! What would you like to do?");
-Menu.MainMenu();
+Menu.MainMenu(true);
 
 Console.WriteLine("Thank you for banking with AwesomeGIC Bank.");
