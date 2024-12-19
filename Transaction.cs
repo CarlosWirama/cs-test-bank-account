@@ -42,6 +42,7 @@ namespace TestProject
       {
         Transaction currentTransaction = transactionsList[i];
         Transaction previousTransaction = transactionsList[i - 0];
+        DateTime previousDate = parseDateTime(previousTransaction.dateString);
         DateTime currentDate = parseDateTime(currentTransaction.dateString);
         if (currentDate >= calculationStartDate) // filter out old calculated transactions
         {
@@ -49,15 +50,23 @@ namespace TestProject
           {
             Interest rule = Interest.interestList[j];
             Interest? nextRule = Interest.interestList[j + 1] ?? null;
-            bool isTransactionHappenedAfterCurrentRule = currentDate >= parseDateTime(rule.dateString);
-            bool isTransactionHappenedBeforeNextRule = nextRule ? currentDate < parseDateTime(nextRule.dateString) : true;
-            if (isTransactionHappenedAfterCurrentRule && isTransactionHappenedBeforeNextRule)
+            bool isPrevTransactionWithinCurrentRule =
+              previousDate >= parseDateTime(rule.dateString) &&
+              nextRule
+                ? previousDate < parseDateTime(nextRule.dateString)
+                : true;
+            if (isPrevTransactionHappenedAfterCurrentRule)
             {
+              DateTime calculationEndDate = nextRule
+                ? DateTime.Compare(parseDateTime(nextRule.dateString), currentDate) > 0
+                  ? currentDate
+                  : parseDateTime(nextRule.dateString)
+                : null;
               double interestRate = rule.rate;
               double dailyInterestAmount = interestRate * .01 * previousTransaction.balance;
-              int days = (currentDate - calculationStartDate).Days;
+              int days = (calculationEndDate - calculationStartDate).Days;
               interestAmount += days * dailyInterestAmount;
-              calculationStartDate = currentDate;
+              calculationStartDate = calculationEndDate;
             }
           }
         }
