@@ -6,7 +6,7 @@ namespace TestProject
     public string id = ruleId;
     public double rate = rate;
 
-    public static List<Interest> InterestsList = [];
+    public static List<Interest> interestsList = [];
 
     static public bool VerifyInput(string input)
     {
@@ -29,11 +29,11 @@ namespace TestProject
       string[] inputSplitted = input.Split(' ');
       double rate = double.Parse(inputSplitted[2]);
       Interest newInterest = new Interest(inputSplitted[0], inputSplitted[1], rate);
-      InterestsList.Add(newInterest);
+      interestsList.Add(newInterest);
       Console.WriteLine("");
       Console.WriteLine("Interest rules:");
       Console.WriteLine(" | Date    | Rule Id     | Amount     |");
-      InterestsList.ForEach(Interest =>
+      interestsList.ForEach(Interest =>
       {
         Console.WriteLine($" | {Interest.dateString,7} | {Interest.id,10} | {Interest.rate, 10:C} |");
       });

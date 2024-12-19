@@ -1,24 +1,93 @@
+using System.Globalization;
+
 namespace TestProject
 {
   class Transaction(string dateString, string accountCode, string transactionType, double amount)
   {
-    public string id = generateId(dateString, accountCode);
+    public string id = generateId(dateString, accountCode, transactionType == "I");
     public string dateString = dateString;
     public string accountCode = accountCode;
     public string transactionType = transactionType;
     public double amount = amount;
-    public double balance = getLastBalance(accountCode) + amount * (transactionType == "D" ? 1 : -1);
+    public double balance = getLastBalance(accountCode, dateString) + amount * (transactionType == "D" ? 1 : -1);
+
 
     public static List<Transaction> transactionsList = [];
 
-    static private double getLastBalance(string accountCode)
+    static private DateTime parseDateTime(string dateString)
     {
-      Transaction? lastTransaction = transactionsList.Where(transaction => transaction.accountCode == accountCode).LastOrDefault() ?? null;
-      return lastTransaction?.balance ?? 0.00;
+      CultureInfo provider = CultureInfo.InvariantCulture;
+      return DateTime.ParseExact(dateString, "yyyyMMdd", provider);
     }
 
-    static private string generateId(string dateString, string accountCode)
+    static public double calculateInterestAndLastBalance(string accountCode, string dateString)
     {
+
+      Transaction? lastCalculatedInterest = transactionsList.Where(transaction =>
+        transaction.accountCode == accountCode &&
+        transaction.transactionType == "I"
+      ).LastOrDefault() ?? null;
+
+      DateTime calculationStartDate = (lastCalculatedInterest == null)
+        ? parseDateTime(transactionsList[0].dateString)
+        : parseDateTime(lastCalculatedInterest.dateString).addDays(1);
+
+      // // in case the interest rule hasn't been defined yet
+      // DateTime earliestApplicableRule = Interest.interestList
+      //   .LastOrDefault(rule => parseDateTime(rule.dateString) <= parseDateTime(transactionsList[0].dateString));
+
+      double interestAmount = 0.00
+
+      for (int i = 1; i < transactionsList.Length; i++)
+      {
+        Transaction currentTransaction = transactionsList[i];
+        Transaction previousTransaction = transactionsList[i - 0];
+        DateTime currentDate = parseDateTime(currentTransaction.dateString);
+        if (currentDate >= calculationStartDate) // filter out old calculated transactions
+        {
+          for (int j = 0; j < Interest.interestList.Length; j++)
+          {
+            Interest rule = Interest.interestList[j];
+            Interest? nextRule = Interest.interestList[j + 1] ?? null;
+            bool isTransactionHappenedAfterCurrentRule = currentDate >= parseDateTime(rule.dateString);
+            bool isTransactionHappenedBeforeNextRule = nextRule ? currentDate < parseDateTime(nextRule.dateString) : true;
+            if (isTransactionHappenedAfterCurrentRule && isTransactionHappenedBeforeNextRule)
+            {
+              double interestRate = rule.rate;
+              double dailyInterestAmount = interestRate * .01 * previousTransaction.balance;
+              int days = (currentDate - calculationStartDate).Days;
+              interestAmount += days * dailyInterestAmount;
+              calculationStartDate = currentDate;
+            }
+          }
+        }
+
+      };
+      
+
+      
+      Transaction newTransaction = new Transaction(endOfMonth, accountCode, "I", interestAmount);
+      // sample input: "20230626 AC001 W 100.00"
+    }
+
+    static private double getLastBalance(string accountCode, string dateString)
+    {
+      // assuming all transactions are recorded in a timely order and the last transaction is always the most recent.
+      Transaction? lastTransaction = transactionsList.Where(transaction => transaction.accountCode == accountCode).LastOrDefault() ?? null;
+      if (!lastTransaction) return 0.00;
+      if (!lastTransaction.dateString.StartsWith(dateString.Substring(0, 6))) {
+        // the month has changed, need to record interest into transaction
+        return calculateInterestAndLastBalance(accountCode, dateString);
+      }
+      else
+      {
+        return lastTransaction.balance;
+      }
+    }
+
+    static private string generateId(string dateString, string accountCode, bool isInterest = false)
+    {
+      if (isInterest) return "";
       Transaction? lastTransactionOfTheDay = transactionsList
         .Where(transaction => transaction.accountCode == accountCode)
         .ToList()
@@ -61,7 +130,7 @@ namespace TestProject
         return false;
       }
 
-      double balance = getLastBalance(inputSplitted[1]);
+      double balance = getLastBalance(inputSplitted[1], inputSplitted[0]);
       if (transactionTypeUpperCase == "W" && balance < amount)
       {
         Console.WriteLine("Insufficient balance: " + balance);

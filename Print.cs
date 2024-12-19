@@ -22,6 +22,10 @@ namespace TestProject
       string account = inputSplitted[0];
       string yearDate = inputSplitted[1];
       
+      // since we don't have cronjob for auto-calculation every end of month,
+      // assume that we won't calculate at the end of the month until the next transaction
+      // is recorded on a different month.
+
       Console.WriteLine(" | Date     | Txn Id      | Type | Amount     | Balance      |");
 
       Transaction.transactionsList
