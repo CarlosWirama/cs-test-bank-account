@@ -32,10 +32,10 @@ namespace TestProject
       interestsList.Add(newInterest);
       Console.WriteLine("");
       Console.WriteLine("Interest rules:");
-      Console.WriteLine(" | Date    | Rule Id     | Amount     |");
+      Console.WriteLine(" | Date     | Rule Id    | Amount     |");
       interestsList.ForEach(Interest =>
       {
-        Console.WriteLine($" | {Interest.dateString,7} | {Interest.id,10} | {Interest.rate, 10:C} |");
+        Console.WriteLine($" | {Interest.dateString,7} | {Interest.id,10} | {Interest.rate, 10:F2} |");
       });
     }
   }

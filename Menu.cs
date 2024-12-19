@@ -44,9 +44,9 @@ namespace TestProject
       } else if (Print.VerifyInput(input))
       {
         Print.PrintStatement(input);
+        MainMenu();
       } else {
         PrintMenu();
-        MainMenu();
       }
     }
 
@@ -63,15 +63,15 @@ namespace TestProject
       Console.WriteLine("[P] Print statement");
       Console.WriteLine("[Q] Quit");
       string choice = Console.ReadLine() ?? "";
-      string choiceLowerCase = choice.ToLower();
+      string choiceLowerCase = choice.ToUpper();
 
       switch (choiceLowerCase)
       {
-        case "t": TransactionMenu(); break;
-        case "i": InterestMenu(); break;
-        case "p": PrintMenu(); break;
+        case "T": TransactionMenu(); break;
+        case "I": InterestMenu(); break;
+        case "P": PrintMenu(); break;
         // quit
-        case "q": break;
+        case "Q": break;
         default: MainMenu(); break;
       }
     }

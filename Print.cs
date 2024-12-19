@@ -26,7 +26,7 @@ namespace TestProject
       // assume that we won't calculate at the end of the month until the next transaction
       // is recorded on a different month.
 
-      Console.WriteLine(" | Date     | Txn Id      | Type | Amount     | Balance      |");
+      Console.WriteLine(" | Date     | Txn Id      | Type | Amount     | Balance    |");
 
       Transaction.transactionsList
         .Where(transaction =>

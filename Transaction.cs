@@ -9,7 +9,7 @@ namespace TestProject
     public string accountCode = accountCode;
     public string transactionType = transactionType;
     public double amount = amount;
-    public double balance = getLastBalance(accountCode, dateString) + amount * (transactionType == "D" ? 1 : -1);
+    public double balance = getLastBalance(accountCode, dateString) + amount * (transactionType == "W" ? -1 : 1);
 
 
     public static List<Transaction> transactionsList = [];
@@ -30,11 +30,11 @@ namespace TestProject
 
       DateTime calculationStartDate = (lastCalculatedInterest == null)
         ? parseDateTime(transactionsList[0].dateString)
-        : parseDateTime(lastCalculatedInterest.dateString).addDays(1);
+        : parseDateTime(lastCalculatedInterest.dateString).AddDays(1);
 
-      double interestAmount = 0.00
+      double interestAmount = 0.00;
 
-      for (int i = 1; i < transactionsList.Length; i++)
+      for (int i = 1; i < transactionsList.Count; i++)
       {
         Transaction currentTransaction = transactionsList[i];
         Transaction previousTransaction = transactionsList[i - 0];
@@ -42,22 +42,17 @@ namespace TestProject
         DateTime currentDate = parseDateTime(currentTransaction.dateString);
         if (currentDate >= calculationStartDate) // filter out old calculated transactions
         {
-          for (int j = 0; j < Interest.interestList.Length; j++)
+          for (int j = 0; j < Interest.interestsList.Count; j++)
           {
-            Interest rule = Interest.interestList[j];
-            Interest? nextRule = Interest.interestList[j + 1] ?? null;
+            Interest rule = Interest.interestsList[j];
+            Interest? nextRule = j >= Interest.interestsList.Count - 1 ? null : Interest.interestsList[j + 1];
+            DateTime nextRuleDate = nextRule != null ? parseDateTime(nextRule.dateString) : DateTime.Now;
             bool isPrevTransactionWithinCurrentRule =
               previousDate >= parseDateTime(rule.dateString) &&
-              nextRule
-                ? previousDate < parseDateTime(nextRule.dateString)
-                : true;
-            if (isPrevTransactionHappenedAfterCurrentRule)
+              previousDate < nextRuleDate;
+            if (isPrevTransactionWithinCurrentRule)
             {
-              DateTime calculationEndDate = nextRule
-                ? DateTime.Compare(parseDateTime(nextRule.dateString), currentDate) > 0
-                  ? currentDate
-                  : parseDateTime(nextRule.dateString)
-                : null;
+              DateTime calculationEndDate = DateTime.Compare(nextRuleDate, currentDate) > 0 ? currentDate : nextRuleDate;
               double interestRate = rule.rate;
               double dailyInterestAmount = interestRate * .01 * previousTransaction.balance;
               int days = (calculationEndDate - calculationStartDate).Days;
@@ -70,12 +65,12 @@ namespace TestProject
         bool isChangingMonth = !currentTransaction.dateString.StartsWith(prevTransactionYearMonth);
         if (isChangingMonth) {
           int day = DateTime.DaysInMonth(
-            (int) prevTransactionYearMonth.Substring(0, 4),
-            (int) prevTransactionYearMonth.Substring(4, 2)
+            Convert.ToInt32(prevTransactionYearMonth.Substring(0, 4)),
+            Convert.ToInt32(prevTransactionYearMonth.Substring(4, 2))
           );
           string endOfMonth = prevTransactionYearMonth + day;
           Transaction newTransaction = new Transaction(endOfMonth, accountCode, "I", interestAmount);
-          transactionsList.Insert(i, newTransaction);
+          transactionsList.Add(newTransaction);
           interestAmount = 0.00;
           // TODO
           // this will not exactly counting at the last day of the month, instead
@@ -84,13 +79,14 @@ namespace TestProject
           // taking a lot of time
         }
       };
+      return transactionsList[transactionsList.Count - 1].balance;
     }
 
     static private double getLastBalance(string accountCode, string dateString)
     {
       // assuming all transactions are recorded in a timely order and the last transaction is always the most recent.
       Transaction? lastTransaction = transactionsList.Where(transaction => transaction.accountCode == accountCode).LastOrDefault() ?? null;
-      if (!lastTransaction) return 0.00;
+      if (lastTransaction == null) return 0.00;
       if (!lastTransaction.dateString.StartsWith(dateString.Substring(0, 6))) {
         // the month has changed, need to record interest into transaction
         return calculateInterestAndLastBalance(accountCode, dateString);
@@ -161,8 +157,9 @@ namespace TestProject
       // sample input: "20230626 AC001 W 100.00"
       string[] inputSplitted = input.Split(' ');
       string accountCode = inputSplitted[1];
+      string transactionType = inputSplitted[2].ToUpper();
       double amount = Convert.ToDouble(inputSplitted[3]);
-      Transaction newTransaction = new Transaction(inputSplitted[0], accountCode, inputSplitted[2], amount);
+      Transaction newTransaction = new Transaction(inputSplitted[0], accountCode, transactionType, amount);
       transactionsList.Add(newTransaction);
       Console.WriteLine("");
       Console.WriteLine("Account: " + accountCode);
