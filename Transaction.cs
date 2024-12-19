@@ -32,10 +32,6 @@ namespace TestProject
         ? parseDateTime(transactionsList[0].dateString)
         : parseDateTime(lastCalculatedInterest.dateString).addDays(1);
 
-      // // in case the interest rule hasn't been defined yet
-      // DateTime earliestApplicableRule = Interest.interestList
-      //   .LastOrDefault(rule => parseDateTime(rule.dateString) <= parseDateTime(transactionsList[0].dateString));
-
       double interestAmount = 0.00
 
       for (int i = 1; i < transactionsList.Length; i++)
@@ -70,13 +66,24 @@ namespace TestProject
             }
           }
         }
-
+        string prevTransactionYearMonth = previousTransaction.dateString.Substring(0, 6);
+        bool isChangingMonth = !currentTransaction.dateString.StartsWith(prevTransactionYearMonth);
+        if (isChangingMonth) {
+          int day = DateTime.DaysInMonth(
+            (int) prevTransactionYearMonth.Substring(0, 4),
+            (int) prevTransactionYearMonth.Substring(4, 2)
+          );
+          string endOfMonth = prevTransactionYearMonth + day;
+          Transaction newTransaction = new Transaction(endOfMonth, accountCode, "I", interestAmount);
+          transactionsList.Insert(i, newTransaction);
+          interestAmount = 0.00;
+          // TODO
+          // this will not exactly counting at the last day of the month, instead
+          // it will follow the next transaction date or the next rule date.
+          // further validation needed for this, i leave if as a TODO since it's already
+          // taking a lot of time
+        }
       };
-      
-
-      
-      Transaction newTransaction = new Transaction(endOfMonth, accountCode, "I", interestAmount);
-      // sample input: "20230626 AC001 W 100.00"
     }
 
     static private double getLastBalance(string accountCode, string dateString)
