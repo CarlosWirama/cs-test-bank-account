@@ -7,6 +7,8 @@ namespace TestProject
     public string accountCode = accountCode;
     public string transactionType = transactionType;
     public double amount = amount;
+    // TODO
+    public double balance = amount;
 
     public static List<Transaction> transactionsList = [];
 

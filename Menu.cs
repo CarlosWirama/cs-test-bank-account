@@ -32,6 +32,21 @@ namespace TestProject
       }
     }
 
+    static void PrintMenu()
+    {
+      Console.WriteLine("Please enter account and month to generate the statement <Account> <Year><Month>");
+      Console.WriteLine("(or enter blank to go back to main menu):");
+      string input = Console.ReadLine() ?? "";
+      if (input == "") {
+        MainMenu();
+      } else if (Print.VerifyInput(input))
+      {
+        Print.Print(input);
+      } else {
+        PrintMenu();
+      }
+    }
+
 
     static public void MainMenu()
     {
@@ -44,19 +59,12 @@ namespace TestProject
 
       switch (choiceLowerCase)
       {
-        case "t":
-          TransactionMenu();
-          break;
-        case "i":
-          break;
-        case "p":
-          break;
-        case "q":
-          // quit
-          break;
-        default:
-          MainMenu();
-          break;
+        case "t": TransactionMenu(); break;
+        case "i": InterestMenu(); break;
+        case "p": PrintMenu(); break;
+        // quit
+        case "q": break;
+        default MainMenu(); break;
       }
     }
   }
