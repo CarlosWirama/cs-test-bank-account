@@ -2,7 +2,7 @@ namespace TestProject
 {
   class Transaction(string dateString, string accountCode, string transactionType, double amount)
   {
-    public string id = generateId(dateString);
+    public string id = generateId(dateString, accountCode);
     public string dateString = dateString;
     public string accountCode = accountCode;
     public string transactionType = transactionType;
@@ -10,9 +10,12 @@ namespace TestProject
 
     public static List<Transaction> transactionsList = [];
 
-    static private string generateId(string dateString)
+    static private string generateId(string dateString, string accountCode)
     {
-      Transaction? lastTransactionOfTheDay = transactionsList.FindLast(transaction => transaction.dateString == dateString) ?? null;
+      Transaction? lastTransactionOfTheDay = transactionsList
+        .Where(transaction => transaction.accountCode == accountCode)
+        .ToList()
+        .FindLast(transaction => transaction.dateString == dateString) ?? null;
       if (lastTransactionOfTheDay == null)
       {
         return dateString + "-01";
@@ -42,7 +45,7 @@ namespace TestProject
       Console.WriteLine("");
       Console.WriteLine("Account: " + accountCode);
       Console.WriteLine(" | Date    | Txn Id     | Type | Amount     |");
-      transactionsList.ForEach(transaction =>
+      transactionsList.Where(transaction => transaction.accountCode == accountCode).ToList().ForEach(transaction =>
       {
         Console.WriteLine($" | {transaction.dateString,7} | {transaction.id,10} | {transaction.transactionType,1}    | {transaction.amount, 10:C} |");
       });
