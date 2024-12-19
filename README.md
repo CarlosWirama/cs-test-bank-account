@@ -1,3 +1,11 @@
+# Note from me
+ I came from javascript/typescript background, so my approach looks more functional oriented instead of OOP.
+ I chose this to do the assignment quickly. I do have some experience in OOP (C# and Java) long way back and
+ I'm willing to pick up again, so whatever language I'm going to use should not be a problem.
+ 
+ Thank you for understanding!
+ 
+
 # Bank Account
 
 You're designing a simple banking system that handles operations on bank accounts. The system should be capable of the following features:
